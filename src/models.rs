@@ -10,13 +10,6 @@ pub struct InventoryItem {
 }
 
 #[derive(Deserialize)]
-pub struct CreateItem {
-    pub id: String,
-    pub sku: String,
-    pub quantity: i32,
-}
-
-#[derive(Deserialize)]
 pub struct UpdateQuantity {
     pub quantity: i32,
 }
