@@ -43,9 +43,10 @@ impl InventoryService {
         .await?;
 
         Ok(InventoryItem {
+            name: item.name.clone(),
             id: item.id.clone(),
             sku: item.sku.clone(),
-            total_quantity: item.quantity as i32,
+            total_quantity: item.quantity as i64,
             reserved_quantity: 0,
         })
     }
@@ -53,14 +54,7 @@ impl InventoryService {
     pub async fn list_items(&self) -> Result<Vec<InventoryItem>, ServiceError> {
         let rows = sqlx::query_as!(
             InventoryItem,
-            r#"
-            SELECT
-                id AS "id!",
-                sku AS "sku!",
-                total_quantity AS "total_quantity!: i32",
-                reserved_quantity AS "reserved_quantity!: i32"
-            FROM inventory
-            "#
+            "SELECT id, name, sku, reserved_quantity, total_quantity FROM inventory"
         )
         .fetch_all(&self.pool)
         .await?;
