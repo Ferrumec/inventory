@@ -1,6 +1,8 @@
 use crate::models::InventoryItem;
 use ferrumec::CreateItem;
-use sqlx::{Error, SqlitePool, sqlite::SqliteQueryResult};
+use sqlx::{Error, SqlitePool};
+
+static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
 
 #[derive(Debug)]
 pub enum ServiceError {
@@ -21,17 +23,8 @@ pub struct InventoryService {
 }
 
 impl InventoryService {
-    pub async fn init_schema(pool: &SqlitePool) -> Result<SqliteQueryResult, Error> {
-        sqlx::query(
-            "CREATE TABLE IF NOT EXISTS inventory (
-                id TEXT PRIMARY KEY,
-                sku TEXT NOT NULL,
-                total_quantity INTEGER NOT NULL,
-                reserved_quantity INTEGER NOT NULL
-            )",
-        )
-        .execute(pool)
-        .await
+    pub async fn init_schema(pool: &SqlitePool) -> Result<(), Error> {
+        MIGRATOR.run(pool).await.map_err(sqlx::Error::from)
     }
     pub async fn new(pool: SqlitePool) -> Result<Self, Error> {
         InventoryService::init_schema(&pool).await?;
@@ -39,13 +32,15 @@ impl InventoryService {
     }
 
     pub async fn create_item(&self, item: &CreateItem) -> Result<InventoryItem, ServiceError> {
-        let query = "INSERT INTO inventory (id, sku, total_quantity, reserved_quantity) VALUES (?, ?, ?, 0)";
-        sqlx::query(query)
-            .bind(&item.id)
-            .bind(&item.sku)
-            .bind(item.quantity)
-            .execute(&self.pool)
-            .await?;
+        let total_quantity = i64::from(item.quantity);
+        sqlx::query!(
+            "INSERT INTO inventory (id, sku, total_quantity, reserved_quantity) VALUES (?, ?, ?, 0)",
+            item.id,
+            item.sku,
+            total_quantity,
+        )
+        .execute(&self.pool)
+        .await?;
 
         Ok(InventoryItem {
             id: item.id.clone(),
@@ -56,10 +51,19 @@ impl InventoryService {
     }
 
     pub async fn list_items(&self) -> Result<Vec<InventoryItem>, ServiceError> {
-        let query = "SELECT id, sku, total_quantity, reserved_quantity FROM inventory";
-        let rows = sqlx::query_as::<_, InventoryItem>(query)
-            .fetch_all(&self.pool)
-            .await?;
+        let rows = sqlx::query_as!(
+            InventoryItem,
+            r#"
+            SELECT
+                id AS "id!",
+                sku AS "sku!",
+                total_quantity AS "total_quantity!: i32",
+                reserved_quantity AS "reserved_quantity!: i32"
+            FROM inventory
+            "#
+        )
+        .fetch_all(&self.pool)
+        .await?;
 
         Ok(rows)
     }
@@ -69,15 +73,16 @@ impl InventoryService {
             return Err(ServiceError::BadRequest("Quantity must be positive".into()));
         }
 
-        let result = sqlx::query(
+        let qty_i64 = i64::from(qty);
+        let result = sqlx::query!(
             "UPDATE inventory
              SET reserved_quantity = reserved_quantity + ?
              WHERE id = ?
              AND total_quantity - reserved_quantity >= ?",
+            qty_i64,
+            id,
+            qty_i64,
         )
-        .bind(qty)
-        .bind(id)
-        .bind(qty)
         .execute(&self.pool)
         .await?;
 
@@ -93,15 +98,16 @@ impl InventoryService {
             return Err(ServiceError::BadRequest("Quantity must be positive".into()));
         }
 
-        let result = sqlx::query(
+        let qty_i64 = i64::from(qty);
+        let result = sqlx::query!(
             "UPDATE inventory
              SET reserved_quantity = reserved_quantity - ?
              WHERE id = ?
              AND reserved_quantity >= ?",
+            qty_i64,
+            id,
+            qty_i64,
         )
-        .bind(qty)
-        .bind(id)
-        .bind(qty)
         .execute(&self.pool)
         .await?;
 
@@ -119,17 +125,18 @@ impl InventoryService {
             return Err(ServiceError::BadRequest("Quantity must be positive".into()));
         }
 
-        let result = sqlx::query(
+        let qty_i64 = i64::from(qty);
+        let result = sqlx::query!(
             "UPDATE inventory
              SET reserved_quantity = reserved_quantity - ?,
                  total_quantity = total_quantity - ?
              WHERE id = ?
              AND reserved_quantity >= ?",
+            qty_i64,
+            qty_i64,
+            id,
+            qty_i64,
         )
-        .bind(qty)
-        .bind(qty)
-        .bind(id)
-        .bind(qty)
         .execute(&self.pool)
         .await?;
 

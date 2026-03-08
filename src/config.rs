@@ -1,10 +1,11 @@
-use crate::db;
 use crate::handlers;
 use crate::services;
 use crate::services::InventoryService;
 use actix_web::web;
 use auth_middleware::Auth;
 use sqlx::Error;
+use sqlx::Pool;
+use sqlx::Sqlite;
 
 #[derive(Clone)]
 pub struct InventoryModule {
@@ -12,8 +13,7 @@ pub struct InventoryModule {
 }
 
 impl InventoryModule {
-    pub async fn new() -> Result<Self, Error> {
-        let pool = db::init_pool().await?;
+    pub async fn new(pool: Pool<Sqlite>) -> Result<Self, Error> {
         let service = services::InventoryService::new(pool.clone()).await?;
         Ok(Self { service })
     }
