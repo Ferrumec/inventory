@@ -17,8 +17,8 @@ impl OnCreateHandler for CreateItemOnInventory {
     type Dto = CreateItem;
     async fn handle(&self, item: CreateItem) -> bool {
         match self.service.create_item(&item).await {
-            Ok(r) => true,
-            Err(e) => false,
+            Ok(_r) => true,
+            Err(_e) => false,
         }
     }
 }
