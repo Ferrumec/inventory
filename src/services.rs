@@ -2,8 +2,6 @@ use crate::models::InventoryItem;
 use ferrumec::CreateItem;
 use sqlx::{Error, SqlitePool};
 
-static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
-
 #[derive(Debug)]
 pub enum ServiceError {
     NotFound,
@@ -23,19 +21,16 @@ pub struct InventoryService {
 }
 
 impl InventoryService {
-    pub async fn init_schema(pool: &SqlitePool) -> Result<(), Error> {
-        MIGRATOR.run(pool).await.map_err(sqlx::Error::from)
-    }
     pub async fn new(pool: SqlitePool) -> Result<Self, Error> {
-        InventoryService::init_schema(&pool).await?;
         Ok(Self { pool })
     }
 
     pub async fn create_item(&self, item: &CreateItem) -> Result<InventoryItem, ServiceError> {
         let total_quantity = i64::from(item.quantity);
         sqlx::query!(
-            "INSERT INTO inventory (id, sku, total_quantity, reserved_quantity) VALUES (?, ?, ?, 0)",
+            "INSERT INTO inventory (id, name, sku, total_quantity, reserved_quantity) VALUES (?, ?, ?, ?, 0)",
             item.id,
+            item.name,
             item.sku,
             total_quantity,
         )
