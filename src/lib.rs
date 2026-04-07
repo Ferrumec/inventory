@@ -2,7 +2,7 @@ mod config;
 mod handlers;
 mod models;
 mod services;
-pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
+mod subscriptions;
 pub use config::InventoryModule;
 use ferrumec::{OnCreateHandler, async_trait};
 

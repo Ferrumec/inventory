@@ -1,4 +1,7 @@
+use std::sync::Arc;
+
 use crate::models::InventoryItem;
+use event_stream::EventStream;
 use ferrumec::CreateItem;
 use sqlx::{Error, SqlitePool};
 
@@ -18,11 +21,12 @@ impl From<sqlx::Error> for ServiceError {
 #[derive(Clone)]
 pub struct InventoryService {
     pool: SqlitePool,
+    pub es: Arc<dyn EventStream>,
 }
 
 impl InventoryService {
-    pub async fn new(pool: SqlitePool) -> Result<Self, Error> {
-        Ok(Self { pool })
+    pub fn new(pool: SqlitePool, es: Arc<dyn EventStream>) -> Result<Self, Error> {
+        Ok(Self { pool, es })
     }
 
     pub async fn create_item(&self, item: &CreateItem) -> Result<InventoryItem, ServiceError> {
