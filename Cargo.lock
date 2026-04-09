@@ -346,6 +346,7 @@ dependencies = [
 [[package]]
 name = "auth_middleware"
 version = "0.1.0"
+source = "git+https://github.com/Austin-rgb/auth_middleware#6d1558c90e5df384d3de3c79ee9791668482a792"
 dependencies = [
  "actix-rt",
  "actix-web",
@@ -354,7 +355,7 @@ dependencies = [
  "chrono",
  "env_logger",
  "futures-util",
- "libsigners",
+ "libsigners 0.1.0 (git+https://github.com/Austin-rgb/auth_middleware)",
  "log",
  "rand 0.8.5",
  "serde",
@@ -808,6 +809,7 @@ dependencies = [
 [[package]]
 name = "event-stream"
 version = "0.1.0"
+source = "git+https://github.com/Austin-rgb/event-stream#92e2e0eb618509cadde71d8118b8e2549be406bb"
 dependencies = [
  "async-nats",
  "async-trait",
@@ -825,10 +827,11 @@ checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 [[package]]
 name = "ferrumec"
 version = "0.1.0"
+source = "git+https://github.com/Austin-rgb/ferrumec#ef5879c5846fc6e4d07a60c5097e829e43e39e1e"
 dependencies = [
  "async-trait",
  "event-stream",
- "libsigners",
+ "libsigners 0.1.0 (git+https://github.com/Austin-rgb/libsigners)",
  "serde",
  "sqlx",
 ]
@@ -1423,12 +1426,27 @@ dependencies = [
 [[package]]
 name = "libsigners"
 version = "0.1.0"
+source = "git+https://github.com/Austin-rgb/auth_middleware#6d1558c90e5df384d3de3c79ee9791668482a792"
 dependencies = [
  "anyhow",
  "chrono",
  "jsonwebtoken",
  "serde",
  "serde_json",
+ "uuid",
+]
+
+[[package]]
+name = "libsigners"
+version = "0.1.0"
+source = "git+https://github.com/Austin-rgb/libsigners#6790b1e4b4e3ba2c533a40925303db50641e085a"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "jsonwebtoken",
+ "serde",
+ "serde_json",
+ "tokio",
  "uuid",
 ]
 
