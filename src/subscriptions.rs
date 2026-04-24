@@ -29,7 +29,7 @@ struct NewOrder {
 
 #[async_trait]
 impl Handler for OnNewOrder {
-    async fn handle(&self, message: Vec<u8>) {
+    async fn handle(&self, subject:String, message: Vec<u8>) {
         let new_order: NewOrder = serde_json::from_str(str::from_utf8(&message).unwrap()).unwrap();
         for item in &new_order.items {
             let _ = self.service.reserve_item(&item.id, item.qty).await;
