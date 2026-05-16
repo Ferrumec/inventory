@@ -10,6 +10,11 @@ serde_json = "1.0"
 uuid = { version = "1", features = ["v4", "serde"] }
 sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio-native-tls", "macros", "migrate"] }
 tokio = { version = "1", features = ["full"] }
-auth_middleware = {git="https://github.com/Austin-rgb/auth_middleware"}
-ferrumec = {git="https://github.com/Austin-rgb/ferrumec"}
-event-stream={git="https://github.com/Austin-rgb/event-stream"}
+#ferrumec = {git="https://github.com/Austin-rgb/ferrumec"}
+#event-stream={git="https://github.com/Austin-rgb/event-stream"}
+actixutils = {path = "../actixutils"}
+#[patch."https://github.com/Austin-rgb/ferrumec"]
+ferrumec = { path = "../ferrumec" }
+
+#[patch."https://github.com/Austin-rgb/event-stream"]
+event-stream = { path = "../event-stream" }
