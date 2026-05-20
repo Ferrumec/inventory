@@ -9,7 +9,7 @@ fn service_error_to_response(err: ServiceError) -> HttpResponse {
         ServiceError::NotFound => HttpResponse::NotFound().body("Item not found"),
         ServiceError::BadRequest(message) => HttpResponse::BadRequest().body(message),
         ServiceError::Db(e) => {
-            eprintln!("Error in database: {}", e);
+            tracing::error!("Error in database: {}", e);
             HttpResponse::InternalServerError().finish()
         }
     }
