@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use event_stream::{EventStream, Handler};
-use ferrumec::async_trait;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::services::InventoryService;

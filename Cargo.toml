@@ -19,3 +19,4 @@ ferrumec = { path = "../ferrumec" }
 #[patch."https://github.com/Austin-rgb/event-stream"]
 event-stream = { path = "../event-stream" }
 tracing = "0.1.44"
+async-trait = "0.1.89"
